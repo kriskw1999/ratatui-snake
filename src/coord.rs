@@ -37,8 +37,8 @@ impl Coord {
     }
 
     pub fn randomize(x_max: f64, y_max: f64) -> Self {
-        let x = (rand::random::<f64>() * x_max - 1.0 - x_max / 2.0).round();
-        let y = (rand::random::<f64>() * y_max - 1.0 - y_max / 2.0).round();
+        let x = (rand::random::<f64>() * x_max - x_max / 2.0).round();
+        let y = (rand::random::<f64>() * y_max - y_max / 2.0).round();
 
         Coord::new(x, y)
     }
