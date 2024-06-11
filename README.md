@@ -1,5 +1,3 @@
-
-https://github.com/kriskw1999/ratatui-snake/assets/71312948/3c74c6d3-66ce-4b9f-9fb0-7a71aa24cd0c
 # Ratatui Snake
 
 ## Preview
