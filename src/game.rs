@@ -12,6 +12,7 @@ pub enum Direction {
 
 #[derive(PartialEq)]
 pub enum GameState {
+    Startup,
     Running,
     Paused,
     GameOver,
@@ -33,7 +34,7 @@ impl Game {
     pub fn new() -> Self {
         Game {
             score: 0,
-            state: GameState::Running,
+            state: GameState::Startup,
             corners: Vec::from([Coord::new(-12.0, 10.0)]),
             total_length: 12,
             head_coord: Coord::new(0.0, 10.0),
@@ -105,7 +106,7 @@ impl Game {
     }
 
     pub fn generate_new_point(&mut self, width: f64, height: f64) {
-        self.point_coord = Some(Coord::randomize(width, height));
+        self.point_coord = Some(Coord::randomize(width - 1.0, height - 1.0));
     }
 
     pub fn check_beat(&mut self) {

@@ -5,6 +5,8 @@ use crossterm::{
     ExecutableCommand,
 };
 use game::{ Direction, Game, GameState };
+
+use letters::Word;
 use ratatui::{
     prelude::{ CrosstermBackend, Terminal },
     style::Color,
@@ -15,6 +17,7 @@ use std::io::{ stdout, Result };
 
 mod coord;
 mod game;
+mod letters;
 
 fn get_collision(p1: &Coord, p2: &Coord) -> bool {
     p1.x == p2.x && p1.y == p2.y
@@ -84,57 +87,66 @@ fn main() -> Result<()> {
 
                         ctx.layer();
 
-                        ctx.print(
-                            -width / 2.0 + 3.0,
-                            height - 4.0,
-                            format!("Score: {}", game.score)
-                        );
-
-                        ctx.layer();
-
-                        game.corners
-                            .windows(2)
-                            .into_iter()
-                            .for_each(|arr| {
-                                let start_coord = &arr[0];
-                                let end_coord = &arr[1];
-
-                                ctx.draw(
-                                    &(Line {
-                                        x1: start_coord.x,
-                                        y1: start_coord.y,
-                                        x2: end_coord.x,
-                                        y2: end_coord.y,
-                                        color: Color::Blue,
-                                    })
-                                );
-                            });
-
-                        ctx.draw(
-                            &(Line {
-                                x1: game.head_coord.x,
-                                y1: game.head_coord.y,
-                                x2: last_corner_coord.x,
-                                y2: last_corner_coord.y,
-                                color: Color::Blue,
-                            })
-                        );
-
-                        if let Some(point) = &game.point_coord {
-                            ctx.draw(
-                                &(Line {
-                                    x1: point.x,
-                                    y1: point.y,
-                                    x2: point.x,
-                                    y2: point.y,
-                                    color: Color::Green,
-                                })
+                        if game.state != GameState::Startup {
+                            ctx.print(
+                                -width / 2.0 + 3.0,
+                                height - 4.0,
+                                format!("Score: {}", game.score)
                             );
                         }
 
-                        if let GameState::GameOver = game.state {
-                            ctx.print(-5.0, 0.0, "Game Over!");
-                            ctx.print(-9.0, -5.0, "Press R to restart");
+                        ctx.layer();
+
+                        match game.state {
+                            GameState::Running | GameState::Paused => {
+                                game.corners
+                                    .windows(2)
+                                    .into_iter()
+                                    .for_each(|arr| {
+                                        let start_coord = &arr[0];
+                                        let end_coord = &arr[1];
+
+                                        ctx.draw(
+                                            &(Line {
+                                                x1: start_coord.x,
+                                                y1: start_coord.y,
+                                                x2: end_coord.x,
+                                                y2: end_coord.y,
+                                                color: Color::Blue,
+                                            })
+                                        );
+                                    });
+
+                                ctx.draw(
+                                    &(Line {
+                                        x1: game.head_coord.x,
+                                        y1: game.head_coord.y,
+                                        x2: last_corner_coord.x,
+                                        y2: last_corner_coord.y,
+                                        color: Color::Blue,
+                                    })
+                                );
+
+                                if let Some(point) = &game.point_coord {
+                                    ctx.draw(
+                                        &(Line {
+                                            x1: point.x,
+                                            y1: point.y,
+                                            x2: point.x,
+                                            y2: point.y,
+                                            color: Color::Red,
+                                        })
+                                    );
+                                }
+                            }
+                            GameState::GameOver => {
+                                ctx.draw(&Word::new("gameover".to_string(), -27.0));
+                                ctx.print(-9.0, -5.0, "Press R to restart");
+                            }
+                            GameState::Startup => {
+                                ctx.draw(&Word::new("ratatui snake".to_string(), -48.0));
+                                ctx.print(-15.0, -5.0, "Press any character to start");
+                            }
                         }
                     }),
 
@@ -145,43 +157,47 @@ fn main() -> Result<()> {
         if event::poll(std::time::Duration::from_millis(16))? {
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
-                    match key.code {
-                        KeyCode::Char('q') => {
-                            break;
-                        }
-                        KeyCode::Char('p') => {
-                            if game.state == GameState::Paused {
-                                game.state = GameState::Running;
-                            } else if GameState::Running == game.state {
-                                game.state = GameState::Paused;
+                    if game.state == GameState::Startup {
+                        game.state = GameState::Running;
+                    } else {
+                        match key.code {
+                            KeyCode::Char('q') => {
+                                break;
                             }
-                        }
-                        KeyCode::Char('a') => {
-                            if game.direction != Direction::Right {
-                                game.change_direction(Direction::Left);
+                            KeyCode::Char('p') => {
+                                if game.state == GameState::Paused {
+                                    game.state = GameState::Running;
+                                } else if GameState::Running == game.state {
+                                    game.state = GameState::Paused;
+                                }
                             }
-                        }
-                        KeyCode::Char('d') => {
-                            if game.direction != Direction::Left {
-                                game.change_direction(Direction::Right);
+                            KeyCode::Char('a') => {
+                                if game.direction != Direction::Right {
+                                    game.change_direction(Direction::Left);
+                                }
                             }
-                        }
-                        KeyCode::Char('w') => {
-                            if game.direction != Direction::Down {
-                                game.change_direction(Direction::Up);
+                            KeyCode::Char('d') => {
+                                if game.direction != Direction::Left {
+                                    game.change_direction(Direction::Right);
+                                }
                             }
-                        }
-                        KeyCode::Char('s') => {
-                            if game.direction != Direction::Up {
-                                game.change_direction(Direction::Down);
+                            KeyCode::Char('w') => {
+                                if game.direction != Direction::Down {
+                                    game.change_direction(Direction::Up);
+                                }
                             }
-                        }
-                        KeyCode::Char('r') | KeyCode::Char('R') => {
-                            if game.state == GameState::GameOver {
-                                game.restart();
+                            KeyCode::Char('s') => {
+                                if game.direction != Direction::Up {
+                                    game.change_direction(Direction::Down);
+                                }
                             }
+                            KeyCode::Char('r') | KeyCode::Char('R') => {
+                                if game.state == GameState::GameOver {
+                                    game.restart();
+                                }
+                            }
+                            _ => {}
                         }
-                        _ => {}
                     }
                 }
             }
