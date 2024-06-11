@@ -2,13 +2,15 @@
 
 ## Preview
 
+https://github.com/kriskw1999/ratatui-snake/assets/71312948/afa777a2-f4e5-40de-beb7-0d3bba17f31f
+
 ## Description
 
 This is a simple snake game made designed using Ratatui as TUI library and Rust as programming language.
 
 ## How to play
 
-Download the binary from
+Download the binary from [here](https://github.com/kriskw1999/ratatui-snake/raw/main/release/ratatui-snake)
 
 ## How to run locally
 
