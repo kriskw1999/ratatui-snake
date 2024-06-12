@@ -14,6 +14,8 @@ This is a simple snake game made designed using Ratatui as TUI library and Rust 
 
 Download the binary from [here](https://github.com/kriskw1999/ratatui-snake/releases)
 
+Or you can install [from the AUR](https://aur.archlinux.org/packages/ratatui-snake): `paru -S ratatui-snake`
+
 ## How to run locally
 
 ```bash
