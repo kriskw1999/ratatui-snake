@@ -166,22 +166,22 @@ fn main() -> Result<()> {
                                     game.state = GameState::Paused;
                                 }
                             }
-                            KeyCode::Char('a') => {
+                            KeyCode::Char('a') | KeyCode::Char('h') => {
                                 if game.direction != Direction::Right {
                                     game.change_direction(Direction::Left);
                                 }
                             }
-                            KeyCode::Char('d') => {
+                            KeyCode::Char('d') | KeyCode::Char('l') => {
                                 if game.direction != Direction::Left {
                                     game.change_direction(Direction::Right);
                                 }
                             }
-                            KeyCode::Char('w') => {
+                            KeyCode::Char('w') | KeyCode::Char('k') => {
                                 if game.direction != Direction::Down {
                                     game.change_direction(Direction::Up);
                                 }
                             }
-                            KeyCode::Char('s') => {
+                            KeyCode::Char('s') | KeyCode::Char('j') => {
                                 if game.direction != Direction::Up {
                                     game.change_direction(Direction::Down);
                                 }
