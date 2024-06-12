@@ -1,0 +1,61 @@
+---
+name: Release
+on:
+  push:
+    tags:
+      - v[0-9]+.*
+jobs:
+  build:
+    permissions:
+      contents: write
+    continue-on-error: false
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+          - target: aarch64-apple-darwin
+            os: macos-latest
+          - target: x86_64-apple-darwin
+            os: macos-latest
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+          - target: aarch64-pc-windows-msvc
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install musl
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: |
+          sudo apt update
+          sudo apt install -y musl-tools gcc
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Strip Binary (linux)
+        if: matrix.target == 'x86_64-unknown-linux-gnu' || matrix.target == 'x86_64-unknown-linux-musl'
+        run: strip ./target/${{ matrix.target }}/release/ratatui-snake
+
+      - name: Rename Binary (unix)
+        if: runner.os != 'Windows'
+        run: mv ./target/${{ matrix.target }}/release/ratatui-snake ./ratatui-snake-${{ matrix.target }}
+
+      - name: Rename Binary (windows)
+        if: runner.os == 'Windows'
+        run: mv ./target/${{ matrix.target }}/release/ratatui-snake.exe ./ratatui-snake-${{ matrix.target }}.exe
+
+      - name: Upload Binary
+        uses: softprops/action-gh-release@v2
+        with:
+          files: "ratatui-snake*"
