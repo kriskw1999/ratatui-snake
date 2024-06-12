@@ -6,10 +6,7 @@ pub struct Coord {
 
 impl Coord {
     pub fn new(x: f64, y: f64) -> Self {
-        Coord {
-            x,
-            y,
-        }
+        Coord { x, y }
     }
 
     pub fn move_left(&mut self, speed: f64) {
@@ -44,8 +41,20 @@ impl Coord {
     }
 
     pub fn move_toward(&mut self, c: &Coord) {
-        let x_diff = if self.x < c.x { 1.0 } else if self.x > c.x { -1.0 } else { 0.0 };
-        let y_diff = if self.y < c.y { 1.0 } else if self.y > c.y { -1.0 } else { 0.0 };
+        let x_diff = if self.x < c.x {
+            1.0
+        } else if self.x > c.x {
+            -1.0
+        } else {
+            0.0
+        };
+        let y_diff = if self.y < c.y {
+            1.0
+        } else if self.y > c.y {
+            -1.0
+        } else {
+            0.0
+        };
 
         self.x += x_diff;
         self.y += y_diff;
