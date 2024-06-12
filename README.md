@@ -12,7 +12,7 @@ This is a simple snake game made designed using Ratatui as TUI library and Rust 
 
 ## How to play
 
-Download the binary from [here](https://github.com/kriskw1999/ratatui-snake/raw/main/release/ratatui-snake)
+Download the binary from [here](https://github.com/kriskw1999/ratatui-snake/releases)
 
 ## How to run locally
 
