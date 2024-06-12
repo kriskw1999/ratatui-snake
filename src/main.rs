@@ -1,19 +1,19 @@
 use coord::Coord;
 use crossterm::{
-    event::{ self, KeyCode, KeyEventKind },
-    terminal::{ disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen },
+    event::{self, KeyCode, KeyEventKind},
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
-use game::{ Direction, Game, GameState };
+use game::{Direction, Game, GameState};
 
 use letters::Word;
 use ratatui::{
-    prelude::{ CrosstermBackend, Terminal },
+    prelude::{CrosstermBackend, Terminal},
     style::Color,
     symbols::Marker,
-    widgets::canvas::{ Canvas, Line, Rectangle },
+    widgets::canvas::{Canvas, Line, Rectangle},
 };
-use std::io::{ stdout, Result };
+use std::io::{stdout, Result};
 
 mod coord;
 mod game;
@@ -50,15 +50,14 @@ fn main() -> Result<()> {
             }
 
             // check if reached the borders
-            if
-                game.head_coord.x.abs() + 1.0 >= width / 2.0 ||
-                game.head_coord.y.abs() + 1.0 == height
+            if game.head_coord.x.abs() + 1.0 >= width / 2.0
+                || game.head_coord.y.abs() + 1.0 == height
             {
                 game.game_over();
             }
 
             // check if the snake has eaten the point
-            if let None = game.point_coord {
+            if game.point_coord.is_none() {
                 game.generate_new_point(width, height);
             } else if let Some(point) = &game.point_coord {
                 if get_collision(&game.head_coord, point) {
@@ -79,10 +78,10 @@ fn main() -> Result<()> {
                             &(Rectangle {
                                 x: -width / 2.0,
                                 y: -height,
-                                width: width,
+                                width,
                                 height: height * 2.0,
                                 color: Color::White,
-                            })
+                            }),
                         );
 
                         ctx.layer();
@@ -91,7 +90,7 @@ fn main() -> Result<()> {
                             ctx.print(
                                 -width / 2.0 + 3.0,
                                 height - 4.0,
-                                format!("Score: {}", game.score)
+                                format!("Score: {}", game.score),
                             );
                         }
 
@@ -99,23 +98,20 @@ fn main() -> Result<()> {
 
                         match game.state {
                             GameState::Running | GameState::Paused => {
-                                game.corners
-                                    .windows(2)
-                                    .into_iter()
-                                    .for_each(|arr| {
-                                        let start_coord = &arr[0];
-                                        let end_coord = &arr[1];
+                                game.corners.windows(2).for_each(|arr| {
+                                    let start_coord = &arr[0];
+                                    let end_coord = &arr[1];
 
-                                        ctx.draw(
-                                            &(Line {
-                                                x1: start_coord.x,
-                                                y1: start_coord.y,
-                                                x2: end_coord.x,
-                                                y2: end_coord.y,
-                                                color: Color::Blue,
-                                            })
-                                        );
-                                    });
+                                    ctx.draw(
+                                        &(Line {
+                                            x1: start_coord.x,
+                                            y1: start_coord.y,
+                                            x2: end_coord.x,
+                                            y2: end_coord.y,
+                                            color: Color::Blue,
+                                        }),
+                                    );
+                                });
 
                                 ctx.draw(
                                     &(Line {
@@ -124,7 +120,7 @@ fn main() -> Result<()> {
                                         x2: last_corner_coord.x,
                                         y2: last_corner_coord.y,
                                         color: Color::Blue,
-                                    })
+                                    }),
                                 );
 
                                 if let Some(point) = &game.point_coord {
@@ -135,7 +131,7 @@ fn main() -> Result<()> {
                                             x2: point.x,
                                             y2: point.y,
                                             color: Color::Red,
-                                        })
+                                        }),
                                     );
                                 }
                             }
@@ -149,8 +145,7 @@ fn main() -> Result<()> {
                             }
                         }
                     }),
-
-                area
+                area,
             )
         });
 

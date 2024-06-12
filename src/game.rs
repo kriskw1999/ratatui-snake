@@ -52,7 +52,11 @@ impl Game {
 
     pub fn increase_frame_num(&mut self) {
         self.frame_num += {
-            if self.frame_num > 10 / (self.speed as i32) { -self.frame_num } else { 1 }
+            if self.frame_num > 10 / (self.speed as i32) {
+                -self.frame_num
+            } else {
+                1
+            }
         };
     }
 
@@ -91,7 +95,8 @@ impl Game {
 
     pub fn change_direction(&mut self, direction: Direction) {
         self.direction = direction;
-        self.corners.push(Coord::new(self.head_coord.x, self.head_coord.y))
+        self.corners
+            .push(Coord::new(self.head_coord.x, self.head_coord.y))
     }
 
     pub fn restart(&mut self) {
@@ -115,9 +120,8 @@ impl Game {
             let end = &pair[1];
 
             // check if the head coord is between start and end
-            if
-                (self.head_coord.x - start.x) * (self.head_coord.x - end.x) <= 0.0 &&
-                (self.head_coord.y - start.y) * (self.head_coord.y - end.y) <= 0.0
+            if (self.head_coord.x - start.x) * (self.head_coord.x - end.x) <= 0.0
+                && (self.head_coord.y - start.y) * (self.head_coord.y - end.y) <= 0.0
             {
                 self.state = GameState::GameOver;
             }
