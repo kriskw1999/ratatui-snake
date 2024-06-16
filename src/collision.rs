@@ -42,7 +42,7 @@ pub fn check_collisions(collidable1: &dyn Collidable, collidable2: &dyn Collidab
         };
 
         for line in borders.windows(2) {
-            if is_point_on_line(&point, (&line[0], &line[1])) {
+            if is_point_on_line(point, (&line[0], &line[1])) {
                 return true;
             }
         }
@@ -70,7 +70,7 @@ pub fn check_collisions(collidable1: &dyn Collidable, collidable2: &dyn Collidab
                 let t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
                 let u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
 
-                if t >= 0.0 && t <= 1.0 && u >= 0.0 && u <= 1.0 {
+                if (0.0..=1.0).contains(&t) && (0.0..=1.0).contains(&u) {
                     return true;
                 }
             }

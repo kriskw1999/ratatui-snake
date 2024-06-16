@@ -33,7 +33,7 @@ impl Point {
 
 impl Collidable for Point {
     fn get_border(&self) -> Vec<Coord> {
-        return vec![self.coord.clone()];
+        vec![self.coord.clone()]
     }
 }
 
