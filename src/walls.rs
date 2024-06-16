@@ -1,9 +1,8 @@
+use collision_detection::{coord::Coord, Collidable};
 use ratatui::{
     style::Color,
     widgets::canvas::{Line, Shape},
 };
-
-use crate::{collision::Collidable, coord::Coord};
 
 pub struct Walls {
     pub corners: [Coord; 4],

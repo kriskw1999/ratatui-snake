@@ -1,4 +1,4 @@
-use collision::check_collisions;
+use collision_detection::check_collisions;
 use crossterm::{
     event::{self, KeyCode, KeyEventKind},
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
@@ -17,8 +17,6 @@ use snake::Snake;
 use std::io::{stdout, Result};
 use walls::Walls;
 
-mod collision;
-mod coord;
 mod game;
 mod letters;
 mod point;

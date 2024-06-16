@@ -1,9 +1,8 @@
+use collision_detection::{coord::Coord, Collidable};
 use ratatui::{
     style::Color,
     widgets::canvas::{Line, Shape},
 };
-
-use crate::{collision::Collidable, coord::Coord};
 
 pub struct Point {
     pub coord: Coord,
@@ -22,8 +21,11 @@ impl Point {
         }
     }
 
-    pub fn get_random_coord(max_x: f64, max_y: f64) -> Coord {
-        Coord::randomize(max_x - 1.0, max_y - 1.0)
+    pub fn get_random_coord(x_max: f64, y_max: f64) -> Coord {
+        let x = (rand::random::<f64>() * x_max - x_max / 2.0).round();
+        let y = (rand::random::<f64>() * y_max - y_max / 2.0).round();
+
+        Coord::new(x, y)
     }
 
     pub fn create_new_point(&mut self) {

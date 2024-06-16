@@ -1,9 +1,10 @@
+use collision_detection::{coord::Coord, Collidable};
 use ratatui::{
     style::Color,
     widgets::canvas::{Line, Shape},
 };
 
-use crate::{collision::Collidable, coord::Coord, game::Direction};
+use crate::game::Direction;
 
 pub struct SnakeHead {
     pub coord: Coord,

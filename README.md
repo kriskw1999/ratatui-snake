@@ -2,9 +2,7 @@
 
 ## Preview
 
-
 https://github.com/kriskw1999/ratatui-snake/assets/71312948/027db3fa-c295-47ad-969d-39018b2cbeca
-
 
 ## Description
 
@@ -30,7 +28,7 @@ The project is divided in 3 main modules:
 
 - `game`: Contains the game logic
 - `main`: Contains the TUI rendering logic and the main loop
-- `coord`: contains the `Coord` struct that represents a 2D coordinate
+- `collision_detection`: is an external lib that contains the collision detection logic
 
 ## Contributing
 
