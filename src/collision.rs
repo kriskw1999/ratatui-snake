@@ -6,7 +6,7 @@ fn is_point_on_line(point_coord: &Coord, (start_coord, end_coord): (&Coord, &Coo
     let Coord { x: x2, y: y2 } = end_coord;
 
     let cross_product = (py - y1) * (x2 - x1) - (px - x1) * (y2 - y1);
-    if cross_product.abs() > std::f64::EPSILON {
+    if cross_product.abs() > f64::EPSILON {
         return false;
     }
 

@@ -224,18 +224,11 @@ impl Letter {
 pub struct Word {
     pub word: String,
     pub starting_x: f64,
-    pub scale: u8,
-    pub color: Color,
 }
 
 impl Word {
     pub fn new(word: String, starting_x: f64) -> Self {
-        Word {
-            word,
-            starting_x,
-            scale: 1,
-            color: Color::White,
-        }
+        Word { word, starting_x }
     }
 }
 
