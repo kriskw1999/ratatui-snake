@@ -1,4 +1,4 @@
-use coord::Coord;
+use collision::check_collisions;
 use crossterm::{
     event::{self, KeyCode, KeyEventKind},
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
@@ -7,21 +7,23 @@ use crossterm::{
 use game::{Direction, Game, GameState};
 
 use letters::Word;
+use point::Point;
 use ratatui::{
     prelude::{CrosstermBackend, Terminal},
-    style::Color,
     symbols::Marker,
-    widgets::canvas::{Canvas, Line, Rectangle},
+    widgets::canvas::Canvas,
 };
+use snake::Snake;
 use std::io::{stdout, Result};
+use walls::Walls;
 
+mod collision;
 mod coord;
 mod game;
 mod letters;
-
-fn get_collision(p1: &Coord, p2: &Coord) -> bool {
-    p1.x == p2.x && p1.y == p2.y
-}
+mod point;
+mod snake;
+mod walls;
 
 fn main() -> Result<()> {
     stdout().execute(EnterAlternateScreen)?;
@@ -29,7 +31,15 @@ fn main() -> Result<()> {
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
 
+    // the size of the board
+    let size = terminal.size()?;
+    let height = size.height as f64;
+    let width = size.width as f64;
+
     let mut game = Game::new();
+    let mut snake = Snake::new();
+    let mut point = Point::new(width, height);
+    let walls = Walls::new(width, height);
 
     loop {
         game.increase_frame_num();
@@ -37,36 +47,20 @@ fn main() -> Result<()> {
         let _ = terminal.draw(|frame| {
             let area = frame.size();
 
-            // the size of the board
-            let height = area.height as f64;
-            let width = area.width as f64;
-
-            // movement
-            if game.state == GameState::Running && game.frame_num == 0 {
-                game.move_tail();
-                game.move_head();
-
-                game.check_beat();
-            }
-
-            // check if reached the borders
-            if game.head_coord.x.abs() + 1.0 >= width / 2.0
-                || game.head_coord.y.abs() + 1.0 == height
-            {
+            if check_collisions(&snake.head, &snake.body) || check_collisions(&snake.head, &walls) {
                 game.game_over();
             }
 
-            // check if the snake has eaten the point
-            if game.point_coord.is_none() {
-                game.generate_new_point(width, height);
-            } else if let Some(point) = &game.point_coord {
-                if get_collision(&game.head_coord, point) {
-                    game.increase_score();
-                    game.generate_new_point(width, height);
-                }
+            if check_collisions(&snake.head, &point) {
+                snake.grow();
+                game.increase_score();
+                point.create_new_point();
             }
 
-            let last_corner_coord = game.corners.last().unwrap();
+            // movement
+            if game.state == GameState::Running && game.frame_num == 0 {
+                snake.move_snake();
+            }
 
             frame.render_widget(
                 Canvas::default()
@@ -74,15 +68,7 @@ fn main() -> Result<()> {
                     .y_bounds([-height, height])
                     .marker(Marker::HalfBlock)
                     .paint(|ctx| {
-                        ctx.draw(
-                            &(Rectangle {
-                                x: -width / 2.0,
-                                y: -height,
-                                width,
-                                height: height * 2.0,
-                                color: Color::White,
-                            }),
-                        );
+                        ctx.draw(&walls);
 
                         ctx.layer();
 
@@ -98,42 +84,8 @@ fn main() -> Result<()> {
 
                         match game.state {
                             GameState::Running | GameState::Paused => {
-                                game.corners.windows(2).for_each(|arr| {
-                                    let start_coord = &arr[0];
-                                    let end_coord = &arr[1];
-
-                                    ctx.draw(
-                                        &(Line {
-                                            x1: start_coord.x,
-                                            y1: start_coord.y,
-                                            x2: end_coord.x,
-                                            y2: end_coord.y,
-                                            color: Color::Blue,
-                                        }),
-                                    );
-                                });
-
-                                ctx.draw(
-                                    &(Line {
-                                        x1: game.head_coord.x,
-                                        y1: game.head_coord.y,
-                                        x2: last_corner_coord.x,
-                                        y2: last_corner_coord.y,
-                                        color: Color::Blue,
-                                    }),
-                                );
-
-                                if let Some(point) = &game.point_coord {
-                                    ctx.draw(
-                                        &(Line {
-                                            x1: point.x,
-                                            y1: point.y,
-                                            x2: point.x,
-                                            y2: point.y,
-                                            color: Color::Red,
-                                        }),
-                                    );
-                                }
+                                ctx.draw(&snake);
+                                ctx.draw(&point);
                             }
                             GameState::GameOver => {
                                 ctx.draw(&Word::new("gameover".to_string(), -27.0));
@@ -167,28 +119,29 @@ fn main() -> Result<()> {
                                 }
                             }
                             KeyCode::Char('a') | KeyCode::Char('h') => {
-                                if game.direction != Direction::Right {
-                                    game.change_direction(Direction::Left);
+                                if snake.head.direction != Direction::Right {
+                                    snake.change_direction(Direction::Left);
                                 }
                             }
                             KeyCode::Char('d') | KeyCode::Char('l') => {
-                                if game.direction != Direction::Left {
-                                    game.change_direction(Direction::Right);
+                                if snake.head.direction != Direction::Left {
+                                    snake.change_direction(Direction::Right);
                                 }
                             }
                             KeyCode::Char('w') | KeyCode::Char('k') => {
-                                if game.direction != Direction::Down {
-                                    game.change_direction(Direction::Up);
+                                if snake.head.direction != Direction::Down {
+                                    snake.change_direction(Direction::Up);
                                 }
                             }
                             KeyCode::Char('s') | KeyCode::Char('j') => {
-                                if game.direction != Direction::Up {
-                                    game.change_direction(Direction::Down);
+                                if snake.head.direction != Direction::Up {
+                                    snake.change_direction(Direction::Down);
                                 }
                             }
                             KeyCode::Char('r') | KeyCode::Char('R') => {
                                 if game.state == GameState::GameOver {
                                     game.restart();
+                                    snake = snake::Snake::new();
                                 }
                             }
                             _ => {}
