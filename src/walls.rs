@@ -45,5 +45,11 @@ impl Collidable for Walls {
         borders.push(self.corners[0].clone());
 
         borders
+            .iter()
+            .map(|coord| Coord {
+                x: coord.x.round(),
+                y: coord.y.round(),
+            })
+            .collect()
     }
 }
