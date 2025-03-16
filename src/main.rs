@@ -106,7 +106,7 @@ fn main() -> Result<()> {
                         game.state = GameState::Running;
                     } else {
                         match key.code {
-                            KeyCode::Char('q')|KeyCode::Esc => {
+                            KeyCode::Char('q') | KeyCode::Esc => {
                                 break;
                             }
                             KeyCode::Char('p') => {
@@ -116,22 +116,22 @@ fn main() -> Result<()> {
                                     game.state = GameState::Paused;
                                 }
                             }
-                            KeyCode::Char('a') | KeyCode::Char('h') |KeyCode::Left=> {
+                            KeyCode::Char('a') | KeyCode::Char('h') | KeyCode::Left => {
                                 if snake.head.direction != Direction::Right {
                                     snake.change_direction(Direction::Left);
                                 }
                             }
-                            KeyCode::Char('d') | KeyCode::Char('l') |KeyCode::Right=> {
+                            KeyCode::Char('d') | KeyCode::Char('l') | KeyCode::Right => {
                                 if snake.head.direction != Direction::Left {
                                     snake.change_direction(Direction::Right);
                                 }
                             }
-                            KeyCode::Char('w') | KeyCode::Char('k')|KeyCode::Up=> {
+                            KeyCode::Char('w') | KeyCode::Char('k') | KeyCode::Up => {
                                 if snake.head.direction != Direction::Down {
                                     snake.change_direction(Direction::Up);
                                 }
                             }
-                            KeyCode::Char('s') | KeyCode::Char('j')|KeyCode::Down => {
+                            KeyCode::Char('s') | KeyCode::Char('j') | KeyCode::Down => {
                                 if snake.head.direction != Direction::Up {
                                     snake.change_direction(Direction::Down);
                                 }
